@@ -1,0 +1,33 @@
+# Зависимости — пересоберём в образе
+vendor
+node_modules
+rr
+
+# Секреты и окружение
+.env
+.env.*
+!.env.example
+
+# Логи и кэш
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*
+!bootstrap/cache/.gitkeep
+!storage/logs/.gitkeep
+
+# Система и мусор
+.git
+.gitignore
+.idea
+.vscode
+*.log
+.DS_Store
+
+# Тесты и фронт (для чистого API не нужны в образе)
+tests
+phpunit.xml
+vite.config.js
+package.json
+package-lock.json
