@@ -8,13 +8,11 @@ use App\Domain\Task\Contracts\TaskRepositoryInterface;
 use App\Models\Task;
 use Illuminate\Support\Collection;
 
-final class EloquentTaskRepository implements TaskRepositoryInterface
+final readonly class EloquentTaskRepository implements TaskRepositoryInterface
 {
     public function __construct(
         private readonly Task $model
-    )
-    {
-    }
+    ) {}
 
     public function create(array $data): Task
     {
@@ -29,7 +27,7 @@ final class EloquentTaskRepository implements TaskRepositoryInterface
 
     public function delete(Task $task): bool
     {
-        return (bool)$task->delete();
+        return (bool) $task->delete();
     }
 
     public function findById(int $id): ?Task
@@ -37,21 +35,23 @@ final class EloquentTaskRepository implements TaskRepositoryInterface
         return $this->model->find($id);
     }
 
-    public function getForUser(int $userId, ?int $familyId = null): Collection
+    public function getForUser(int $userId): Collection
     {
         return $this->model->query()
-            ->where(function ($query) use ($userId, $familyId) {
+            ->where(function ($query) use ($userId) {
                 $query->where('user_id', $userId)
                     ->where('visibility', 'private');
 
-                if ($familyId !== null) {
-                    $query->orWhere(function ($q) use ($familyId) {
-                        $q->where('family_id', $familyId)
-                            ->where('visibility', 'family');
-                    });
-                }
+                $query->orWhere(function ($q) use ($userId) {
+                    $q->where('visibility', 'family')
+                        ->whereIn('family_id', function ($subQuery) use ($userId) {
+                            $subQuery->select('family_id')
+                                ->from('family_user')
+                                ->where('user_id', $userId);
+                        });
+                });
             })
-            ->with(['category', 'assignedTo'])
+            ->with(['category', 'assignedTo', 'family'])
             ->orderByDesc('created_at')
             ->get();
     }

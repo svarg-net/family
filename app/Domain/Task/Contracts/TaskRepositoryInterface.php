@@ -33,7 +33,7 @@ interface TaskRepositoryInterface
      * Получить все задачи пользователя (его личные + семейные, где он участник)
      * Это ключевой метод, который скрывает сложную SQL-логику от бизнес-уровня
      */
-    public function getForUser(int $userId, ?int $familyId = null): Collection;
+    public function getForUser(int $userId): Collection;
 
     /**
      * Получить задачи, назначенные конкретному пользователю (исполнитель)
