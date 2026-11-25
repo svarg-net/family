@@ -29,6 +29,8 @@ interface FamilyRepositoryInterface
      */
     public function addMember(Family $family, User $user, string $role): void;
 
+    public function removeMember(Family $family, User $user): void;
+
     /**
      * Получить всех членов семьи
      */

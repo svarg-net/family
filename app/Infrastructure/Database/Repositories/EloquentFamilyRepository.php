@@ -46,6 +46,11 @@ final readonly class EloquentFamilyRepository implements FamilyRepositoryInterfa
         ]);
     }
 
+    public function removeMember(Family $family, User $user): void
+    {
+        $family->members()->detach($user->id);
+    }
+
     public function getMembers(Family $family): Collection
     {
         return $family->members()->withPivot('role', 'joined_at')->get();
