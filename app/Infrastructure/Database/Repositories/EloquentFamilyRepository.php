@@ -20,11 +20,22 @@ final readonly class EloquentFamilyRepository implements FamilyRepositoryInterfa
         return $this->model->create($data);
     }
 
+    public function update(Family $family, array $data): Family
+    {
+        $family->update($data);
+        return $family->fresh();
+    }
+
     public function findByInviteCode(string $code): ?Family
     {
         return $this->model->query()
             ->where('invite_code', strtoupper($code))
             ->first();
+    }
+
+    public function findById(int $id): ?Family
+    {
+        return $this->model->find($id);
     }
 
     public function addMember(Family $family, User $user, string $role): void

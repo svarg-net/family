@@ -15,4 +15,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/tasks/{id}/status', [TaskController::class, 'updateStatus']);
 
     Route::post('/families', [FamilyController::class, 'store']);
+    Route::put('/families/{id}', [FamilyController::class, 'update']);
+    Route::post('/families/join', [FamilyController::class, 'join']);
 });
