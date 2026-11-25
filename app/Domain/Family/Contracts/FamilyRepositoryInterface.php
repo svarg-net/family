@@ -15,15 +15,21 @@ interface FamilyRepositoryInterface
      */
     public function create(array $data): Family;
 
+    public function update(Family $family, array $data): Family;
+
     /**
      * Найти семью по коду приглашения
      */
     public function findByInviteCode(string $code): ?Family;
 
+    public function findById(int $id): ?Family;
+
     /**
      * Добавить пользователя в семью с определенной ролью
      */
     public function addMember(Family $family, User $user, string $role): void;
+
+    public function removeMember(Family $family, User $user): void;
 
     /**
      * Получить всех членов семьи

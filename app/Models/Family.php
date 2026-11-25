@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 
 #[Fillable(['name', 'description', 'avatar', 'owner_id', 'invite_code'])]
 class Family extends Model
 {
-    use HasFactory, SoftDeletes;
+    use SoftDeletes;
 
     protected function casts(): array
     {
@@ -28,7 +28,7 @@ class Family extends Model
 
     public function members(): BelongsToMany
     {
-        return $this->BelongsToMany(User::class, 'family_user')
+        return $this->belongsToMany(User::class, 'family_user')
             ->withPivot('role', 'joined_at')
             ->withTimestamps();
     }
