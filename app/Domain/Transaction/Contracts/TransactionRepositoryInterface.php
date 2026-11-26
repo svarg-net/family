@@ -15,7 +15,12 @@ interface TransactionRepositoryInterface
     public function create(array $data): Transaction;
 
     /**
-     * Получить транзакции по конкретному счету
+     * Найти транзакцию по ID
+     */
+    public function findById(int $id): ?Transaction;
+
+    /**
+     * Получить транзакции по конкретному счёту (с фильтрацией по типу)
      */
     public function getByAccount(int $accountId, string $type = 'all'): Collection;
 
@@ -23,4 +28,14 @@ interface TransactionRepositoryInterface
      * Получить последние N транзакций пользователя (для дашборда)
      */
     public function getRecentByUser(int $userId, int $limit = 10): Collection;
+
+    /**
+     * Получить все транзакции пользователя с пагинацией (для истории)
+     */
+    public function getByUser(int $userId, ?string $type = null, int $perPage = 20): \Illuminate\Pagination\LengthAwarePaginator;
+
+    /**
+     * Удалить транзакцию (soft delete)
+     */
+    public function delete(Transaction $transaction): bool;
 }

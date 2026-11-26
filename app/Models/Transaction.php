@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
+use App\Domain\Transaction\Enums\TransactionType;
+use App\Domain\Transaction\ValueObjects\MoneyCast;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,17 +15,19 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 ])]
 class Transaction extends Model
 {
-    use HasFactory, SoftDeletes;
+    use SoftDeletes;
 
     protected function casts(): array
     {
         return [
-            'amount' => 'decimal:2',
+            'amount' => MoneyCast::class . ':currency',
             'transaction_date' => 'datetime',
             'account_id' => 'integer',
             'category_id' => 'integer',
             'user_id' => 'integer',
             'transfer_to_account_id' => 'integer',
+            // Если есть поле type, добавляем Enum каст:
+            'type' => TransactionType::class,
         ];
     }
 

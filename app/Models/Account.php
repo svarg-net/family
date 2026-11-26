@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
+use App\Domain\Account\Enums\AccountType;
+use App\Domain\Transaction\ValueObjects\MoneyCast;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,15 +16,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 ])]
 class Account extends Model
 {
-    use HasFactory, SoftDeletes;
+    use SoftDeletes;
 
     protected function casts(): array
     {
         return [
-            'balance' => 'decimal:2',
+            'balance' => MoneyCast::class . ':currency',
             'user_id' => 'integer',
             'family_id' => 'integer',
             'category_id' => 'integer',
+            'type' => AccountType::class,
         ];
     }
 
@@ -45,5 +47,10 @@ class Account extends Model
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    public function allowsNegativeBalance(): bool
+    {
+        return $this->type === AccountType::CREDIT;
     }
 }

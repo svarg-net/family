@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Domain\Account\Contracts\AccountRepositoryInterface;
 use App\Domain\Family\Contracts\FamilyRepositoryInterface;
 use App\Domain\Task\Contracts\TaskRepositoryInterface;
+use App\Domain\Transaction\Contracts\TransactionRepositoryInterface;
+use App\Infrastructure\Database\Repositories\EloquentAccountRepository;
 use App\Infrastructure\Database\Repositories\EloquentFamilyRepository;
 use App\Infrastructure\Database\Repositories\EloquentTaskRepository;
+use App\Infrastructure\Database\Repositories\EloquentTransactionRepository;
 use Illuminate\Support\ServiceProvider;
 
 final class RepositoryServiceProvider extends ServiceProvider
@@ -18,6 +22,8 @@ final class RepositoryServiceProvider extends ServiceProvider
     public array $bindings = [
         TaskRepositoryInterface::class => EloquentTaskRepository::class,
         FamilyRepositoryInterface::class => EloquentFamilyRepository::class,
+        AccountRepositoryInterface::class => EloquentAccountRepository::class,
+        TransactionRepositoryInterface::class => EloquentTransactionRepository::class,
         //TODO Когда будет готова реализацию для Elastic, добавить сюда:
         // TaskSearchInterface::class => ElasticTaskSearchRepository::class,
     ];
