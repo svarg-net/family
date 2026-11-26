@@ -6,11 +6,14 @@ namespace App\Presentation\Http\Controllers;
 
 use App\Application\Transaction\Actions\CreateTransactionAction;
 use App\Application\Transaction\Actions\DeleteTransactionAction;
+use App\Application\Transaction\Actions\UpdateTransactionAction;
+use App\Application\Transaction\DTOs\UpdateTransactionData;
 use App\Application\Transaction\DTOs\CreateTransactionData;
 use App\Domain\Transaction\Contracts\TransactionRepositoryInterface;
 use App\Domain\Transaction\Enums\TransactionType;
 use App\Domain\Transaction\ValueObjects\Money;
 use App\Presentation\Http\Requests\CreateTransactionRequest;
+use App\Presentation\Http\Requests\UpdateTransactionRequest;
 use App\Presentation\Http\Resources\TransactionResource;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -26,6 +29,7 @@ final readonly class TransactionController
         private CreateTransactionAction        $createTransactionAction,
         private TransactionRepositoryInterface $transactionRepository,
         private DeleteTransactionAction        $deleteTransactionAction,
+        private UpdateTransactionAction        $updateTransactionAction,
     )
     {
     }
@@ -103,6 +107,41 @@ final readonly class TransactionController
             $this->deleteTransactionAction->execute($id, $request->user()->id);
 
             return response()->json(['message' => 'Транзакция удалена'], 200);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => $e->getMessage()], 403);
+        }
+    }
+
+    public function update(int $id, UpdateTransactionRequest $request): JsonResponse
+    {
+        try {
+            $dto = new UpdateTransactionData(
+                title: $request->validated('title'),
+                description: $request->validated('description'),
+                amount: $request->validated('amount') !== null
+                    ? new Money((float)$request->validated('amount'), $request->validated('currency', 'RUB'))
+                    : null,
+                type: $request->validated('type')
+                    ? TransactionType::from($request->validated('type'))
+                    : null,
+                accountId: $request->validated('account_id'),
+                transferToAccountId: $request->validated('transfer_to_account_id'),
+                categoryId: $request->validated('category_id'),
+                transactionDate: $request->validated('transaction_date')
+                    ? new \DateTimeImmutable($request->validated('transaction_date'))
+                    : null,
+            );
+
+            $transaction = $this->updateTransactionAction->execute($id, $dto, $request->user()->id);
+
+            return response()->json(new TransactionResource($transaction), 200);
+
+        } catch (InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
 
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => $e->getMessage()], 404);

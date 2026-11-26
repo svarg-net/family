@@ -38,4 +38,9 @@ interface TransactionRepositoryInterface
      * Удалить транзакцию (soft delete)
      */
     public function delete(Transaction $transaction): bool;
+
+    /**
+     * Обновить транзакцию
+     */
+    public function update(Transaction $transaction, array $data): Transaction;
 }

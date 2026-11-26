@@ -11,7 +11,9 @@ use Illuminate\Support\Collection;
 
 final readonly class EloquentTransactionRepository implements TransactionRepositoryInterface
 {
-    public function __construct(private Transaction $model) {}
+    public function __construct(private Transaction $model)
+    {
+    }
 
     public function create(array $data): Transaction
     {
@@ -56,6 +58,12 @@ final readonly class EloquentTransactionRepository implements TransactionReposit
 
     public function delete(Transaction $transaction): bool
     {
-        return (bool) $transaction->delete(); // soft delete благодаря SoftDeletes
+        return (bool)$transaction->delete();
+    }
+
+    public function update(Transaction $transaction, array $data): Transaction
+    {
+        $transaction->update($data);
+        return $transaction->fresh();
     }
 }
