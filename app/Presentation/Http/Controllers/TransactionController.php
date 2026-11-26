@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Presentation\Http\Controllers;
 
 use App\Application\Transaction\Actions\CreateTransactionAction;
+use App\Application\Transaction\Actions\DeleteTransactionAction;
 use App\Application\Transaction\DTOs\CreateTransactionData;
 use App\Domain\Transaction\Contracts\TransactionRepositoryInterface;
 use App\Domain\Transaction\Enums\TransactionType;
 use App\Domain\Transaction\ValueObjects\Money;
 use App\Presentation\Http\Requests\CreateTransactionRequest;
 use App\Presentation\Http\Resources\TransactionResource;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -23,6 +25,7 @@ final readonly class TransactionController
     public function __construct(
         private CreateTransactionAction        $createTransactionAction,
         private TransactionRepositoryInterface $transactionRepository,
+        private DeleteTransactionAction        $deleteTransactionAction,
     )
     {
     }
@@ -91,6 +94,21 @@ final readonly class TransactionController
             return response()->json([
                 'message' => $e->getMessage(),
             ], 404);
+        }
+    }
+
+    public function destroy(int $id, Request $request): JsonResponse
+    {
+        try {
+            $this->deleteTransactionAction->execute($id, $request->user()->id);
+
+            return response()->json(['message' => 'Транзакция удалена'], 200);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => $e->getMessage()], 403);
         }
     }
 }
