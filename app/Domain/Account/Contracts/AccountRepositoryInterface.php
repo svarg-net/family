@@ -28,4 +28,6 @@ interface AccountRepositoryInterface
      * Обновить баланс счёта
      */
     public function updateBalance(Account $account, float $newBalance): Account;
+
+    public function delete(Account $account): bool;
 }

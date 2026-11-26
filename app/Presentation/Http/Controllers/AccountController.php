@@ -4,18 +4,25 @@ declare(strict_types=1);
 
 namespace App\Presentation\Http\Controllers;
 
+use App\Application\Account\Actions\DeleteAccountAction;
 use App\Domain\Account\Contracts\AccountRepositoryInterface;
 use App\Presentation\Http\Resources\AccountResource;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
+use InvalidArgumentException;
 
 final readonly class AccountController
 {
     public function __construct(
-        private AccountRepositoryInterface $accountRepository
-    ) {}
+        private AccountRepositoryInterface $accountRepository,
+        private DeleteAccountAction $deleteAccountAction,
+    )
+    {
+    }
 
     /**
      * GET /api/accounts
@@ -25,7 +32,7 @@ final readonly class AccountController
     {
         $accounts = $this->accountRepository->getForUser(
             userId: $request->user()->id,
-            familyId: $request->query('family_id') ? (int) $request->query('family_id') : null
+            familyId: $request->query('family_id') ? (int)$request->query('family_id') : null
         );
 
         return AccountResource::collection($accounts);
@@ -49,5 +56,23 @@ final readonly class AccountController
         }
 
         return new AccountResource($account);
+    }
+
+    public function destroy(int $id, Request $request): JsonResponse
+    {
+        try {
+            $this->deleteAccountAction->execute($id, $request->user()->id);
+
+            return response()->json(['message' => 'Счёт удалён'], 200);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => $e->getMessage()], 403);
+
+        } catch (InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
     }
 }

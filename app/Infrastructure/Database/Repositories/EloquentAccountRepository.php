@@ -50,4 +50,9 @@ final readonly class EloquentAccountRepository implements AccountRepositoryInter
         $account->update(['balance' => $newBalance]);
         return $account->fresh();
     }
+
+    public function delete(Account $account): bool
+    {
+        return (bool)$account->delete();
+    }
 }
