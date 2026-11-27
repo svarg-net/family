@@ -53,4 +53,9 @@ final readonly class Money
     {
         return new self(abs($this->amount), $this->currency);
     }
+
+    public function __toString(): string
+    {
+        return number_format($this->amount, 2, '.', ' ') . ' ' . $this->currency;
+    }
 }

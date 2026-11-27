@@ -1,7 +1,9 @@
 <?php
 
+use App\Presentation\Http\Controllers\AccountController;
 use App\Presentation\Http\Controllers\FamilyController;
 use App\Presentation\Http\Controllers\TaskController;
+use App\Presentation\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,4 +20,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/families/{id}', [FamilyController::class, 'update']);
     Route::post('/families/join', [FamilyController::class, 'join']);
     Route::delete('/families/{family}/members/{user}', [FamilyController::class, 'removeMember']);
+
+    Route::get('/accounts', [AccountController::class, 'index']);
+    Route::get('/accounts/{id}', [AccountController::class, 'show']);
+    Route::post('/accounts', [AccountController::class, 'store']);
+    Route::put('/accounts/{id}', [AccountController::class, 'update']);
+    Route::delete('/accounts/{id}', [AccountController::class, 'destroy']);
+    Route::get('/accounts/{id}/transactions', [AccountController::class, 'transactions']);
+
+    Route::get('/transactions', [TransactionController::class, 'index']);
+    Route::get('/transactions/{id}', [TransactionController::class, 'show']);
+    Route::post('/transactions', [TransactionController::class, 'store']);
+    Route::delete('/transactions/{id}', [TransactionController::class, 'destroy']);
+    Route::put('/transactions/{id}', [TransactionController::class, 'update']);
 });
