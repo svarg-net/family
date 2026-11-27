@@ -32,4 +32,6 @@ interface AccountRepositoryInterface
     public function delete(Account $account): bool;
 
     public function update(Account $account, array $data): Account;
+
+    public function create(array $data): Account;
 }

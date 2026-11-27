@@ -61,4 +61,9 @@ final readonly class EloquentAccountRepository implements AccountRepositoryInter
         $account->update($data);
         return $account->fresh();
     }
+
+    public function create(array $data): Account
+    {
+        return $this->model->create($data);
+    }
 }
