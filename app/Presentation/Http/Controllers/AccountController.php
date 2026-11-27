@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Presentation\Http\Controllers;
 
 use App\Application\Account\Actions\DeleteAccountAction;
+use App\Application\Account\Actions\UpdateAccountAction;
 use App\Domain\Account\Contracts\AccountRepositoryInterface;
+use App\Presentation\Http\Requests\UpdateAccountRequest;
 use App\Presentation\Http\Resources\AccountResource;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -19,7 +21,8 @@ final readonly class AccountController
 {
     public function __construct(
         private AccountRepositoryInterface $accountRepository,
-        private DeleteAccountAction $deleteAccountAction,
+        private DeleteAccountAction        $deleteAccountAction,
+        private UpdateAccountAction        $updateAccountAction,
     )
     {
     }
@@ -64,6 +67,28 @@ final readonly class AccountController
             $this->deleteAccountAction->execute($id, $request->user()->id);
 
             return response()->json(['message' => 'Счёт удалён'], 200);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+
+        } catch (AuthorizationException $e) {
+            return response()->json(['message' => $e->getMessage()], 403);
+
+        } catch (InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    public function update(int $id, UpdateAccountRequest $request): JsonResponse
+    {
+        try {
+            $account = $this->updateAccountAction->execute(
+                $id,
+                $request->validated(),
+                $request->user()->id
+            );
+
+            return response()->json(new AccountResource($account), 200);
 
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => $e->getMessage()], 404);

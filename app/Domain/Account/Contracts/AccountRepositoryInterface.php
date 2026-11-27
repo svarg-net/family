@@ -30,4 +30,6 @@ interface AccountRepositoryInterface
     public function updateBalance(Account $account, float $newBalance): Account;
 
     public function delete(Account $account): bool;
+
+    public function update(Account $account, array $data): Account;
 }

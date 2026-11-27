@@ -55,4 +55,10 @@ final readonly class EloquentAccountRepository implements AccountRepositoryInter
     {
         return (bool)$account->delete();
     }
+
+    public function update(Account $account, array $data): Account
+    {
+        $account->update($data);
+        return $account->fresh();
+    }
 }
